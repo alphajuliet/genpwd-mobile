@@ -46,26 +46,37 @@ class Generator extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
       generator: 'gen3',
       punctuation: false,
       capitals: false,
-      numbers: false
+      numbers: false,
+      words: [],
     };
+
+    this.dummyWords = [
+      'alpha', 'beta', 'charlie', 'delta', 'echo', 
+      'foxtrot', 'golf', 'hotel', 'india', 'juliet'
+    ];
+
+    this.onGoButton = this.onGoButton.bind(this);
   }
 
-  onPressGo() {
-    Alert.alert("Go button pressed");
+  onGoButton(e) {
+    this.setState({words: this.dummyWords});
   }
 
   render () {
     return (
       <View style={styles.body}>
         <Controls 
-          generator={this.state.generator}
-          onGo={this.onPressGo}
+          generator = {this.state.generator}
+          onGo = {this.onGoButton}
         />
-        <WordList/>
+        <WordList 
+          words = {this.state.words}
+        />
       </View>
     );
   }
@@ -79,13 +90,8 @@ class Controls extends React.Component {
     this.state = { }
   }
 
-  render() {
-    return (
-      <View style = {styles.controls}>
-        <Button
-          title = "Go"
-          onPress = {this.props.onGo}
-        />
+  picker() {
+    return(
         <Picker
           selectedValue = {this.props.generator}
           onValueChange = {(itemValue, itemIndex) => this.setState({generator: itemValue})}>
@@ -94,6 +100,16 @@ class Controls extends React.Component {
           <Picker.Item label = 'Generator 3' value = 'gen3' />
           <Picker.Item label = 'Markov'      value = 'gen4' />
         </Picker>
+    );
+  }
+
+  render() {
+    return (
+      <View style = {styles.controls}>
+        <Button
+          title = "Go"
+          onPress = {this.props.onGo}
+        />
       </View>
     );
   }
@@ -104,25 +120,13 @@ class WordList extends React.Component {
 
   constructor(props) {
     super(props);
-
-    this.state = {
-      words: []
-    };
-  }
-
-  componentDidMount() {
-    const dummyWords = [
-      'alpha', 'beta', 'charlie', 'delta', 'echo', 
-      'foxtrot', 'golf', 'hotel', 'india', 'juliet'
-    ];
-    this.setState({words: dummyWords});
   }
 
   render() {
     return (
       <View style = {styles.wordList}>
         <FlatList 
-          data = {this.state.words}
+          data = {this.props.words}
           renderItem = {
             ({item}) => <Text style={styles.word}>{item}</Text>
           }
@@ -146,19 +150,20 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     paddingTop: 20,
-    backgroundColor: '#429',
+    paddingLeft: 20,
+    backgroundColor: '#74e',
     justifyContent: 'center',
   },
   title: {
     color: '#fff',
     fontWeight: 'bold',
     fontFamily: 'Avenir',
-    fontSize: 48,
+    fontSize: 24,
   },
   subtitle: {
-    color: '#ccc',
+    color: '#aaa',
     fontWeight: 'normal',
-    fontSize: 16,
+    fontSize: 14,
   },
 
   controls: {
@@ -166,9 +171,9 @@ const styles = StyleSheet.create({
   },
 
   body: {
-    flex: 7,
+    flex: 12,
     flexDirection: 'column',
-    padding: 10,
+    padding: 20,
     backgroundColor: '#eef',
   },
   bodyText: {
@@ -177,7 +182,7 @@ const styles = StyleSheet.create({
   },
 
   wordList: {
-    flex: 1,
+    flex: 6,
   },
   word: {
     fontFamily: 'Avenir',
