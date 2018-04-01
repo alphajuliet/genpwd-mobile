@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { Alert, StyleSheet, Text, View, FlatList, Button, Picker } from 'react-native';
+import { generator1, generator2, generator3, generator4 } from './Generator';
 import * as R from 'ramda';
 
 // --------------------------------
@@ -12,7 +13,7 @@ export default class App extends React.Component {
     return (
       <View style={styles.container}>
         <Header/>
-        <Generator/>
+        <Passwords/>
       </View>
     );
   }
@@ -42,29 +43,36 @@ class Header extends React.Component {
 }
 
 // --------------------------------
-class Generator extends React.Component {
+class Passwords extends React.Component {
 
   constructor(props) {
     super(props);
 
     this.state = {
       generator: 'gen3',
-      punctuation: false,
-      capitals: false,
-      numbers: false,
+      punctuation: true,
+      capitals: true,
+      numbers: true,
       words: [],
     };
-
-    this.dummyWords = [
-      'alpha', 'beta', 'charlie', 'delta', 'echo', 
-      'foxtrot', 'golf', 'hotel', 'india', 'juliet'
-    ];
 
     this.onGoButton = this.onGoButton.bind(this);
   }
 
   onGoButton(e) {
-    this.setState({words: this.dummyWords});
+    const opts = {
+      punctuation: this.state.punctuation,
+      capitals: this.state.capitals,
+      numbers: this.state.numbers
+    };
+    const n = 10;
+    const gen = generator2;
+    var w = [];
+
+    for (var i=0; i<n; i++) {
+      w.push([gen.randomWord(opts)]);
+    }
+    this.setState({words: w});
   }
 
   render () {
@@ -107,7 +115,7 @@ class Controls extends React.Component {
     return (
       <View style = {styles.controls}>
         <Button
-          title = "Go"
+          title = "Generate"
           onPress = {this.props.onGo}
         />
       </View>
@@ -166,10 +174,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 
-  controls: {
-    flex: 1,
-  },
-
   body: {
     flex: 12,
     flexDirection: 'column',
@@ -181,8 +185,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 
+  controls: {
+    flex: 1,
+  },
+
   wordList: {
-    flex: 6,
+    flex: 8,
   },
   word: {
     fontFamily: 'Avenir',
