@@ -3,8 +3,9 @@
 
 
 import React from 'react';
-import { Alert, StyleSheet, Text, View, FlatList, Button, Picker } from 'react-native';
-import { generator1, generator2, generator3, generator4 } from './Generator';
+import { generator1, generator2, generator3, generator4, generators } from './Generator';
+import { Alert, StyleSheet, Text, View, FlatList, Button, Picker, StatusBar } from 'react-native';
+import { Container } from 'native-base';
 import * as R from 'ramda';
 
 // --------------------------------
@@ -12,6 +13,7 @@ export default class App extends React.Component {
   render() {
     return (
       <View style={styles.container}>
+        <StatusBar barStyle="light-content"/>
         <Header/>
         <Passwords/>
       </View>
@@ -49,29 +51,29 @@ class Passwords extends React.Component {
     super(props);
 
     this.state = {
-      generator: 'gen3',
-      punctuation: true,
-      capitals: true,
-      numbers: true,
+      opts: {
+        punctuation: true,
+        capitals: true,
+        numbers: true,
+      },
       words: [],
     };
-
+    this.initGenerators();
     this.onGoButton = this.onGoButton.bind(this);
   }
 
-  onGoButton(e) {
-    const opts = {
-      punctuation: this.state.punctuation,
-      capitals: this.state.capitals,
-      numbers: this.state.numbers
-    };
-    const n = 10;
-    const gen = generator2;
-    var w = [];
+  initGenerators() {
+    this.state.generator = generator4; 
+  }
 
-    for (var i=0; i<n; i++) {
-      w.push([gen.randomWord(opts)]);
-    }
+  onGoButton() {
+    const gen = this.state.generator;
+    const opts = this.state.opts;
+    const n = 10;
+
+    // Create an empty array of the right length, then map the random words into
+    // it.
+    var w = (new Array(n)).fill('').map(x => gen.randomWord(opts))
     this.setState({words: w});
   }
 
@@ -101,12 +103,14 @@ class Controls extends React.Component {
   picker() {
     return(
         <Picker
+          style = {styles.picker}
+          itemStyle = {styles.pickerItem}
           selectedValue = {this.props.generator}
           onValueChange = {(itemValue, itemIndex) => this.setState({generator: itemValue})}>
-          <Picker.Item label = 'Generator 1' value = 'gen1' />
-          <Picker.Item label = 'Generator 2' value = 'gen2' />
-          <Picker.Item label = 'Generator 3' value = 'gen3' />
-          <Picker.Item label = 'Markov'      value = 'gen4' />
+          <Picker.Item label = 'Generator 1' value = 'generator1' />
+          <Picker.Item label = 'Generator 2' value = 'generator2' />
+          <Picker.Item label = 'Generator 3' value = 'generator3' />
+          <Picker.Item label = 'Markov'      value = 'generator4' />
         </Picker>
     );
   }
@@ -115,6 +119,7 @@ class Controls extends React.Component {
     return (
       <View style = {styles.controls}>
         <Button
+          style = {styles.button}
           title = "Generate"
           onPress = {this.props.onGo}
         />
@@ -159,7 +164,7 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingTop: 20,
     paddingLeft: 20,
-    backgroundColor: '#74e',
+    backgroundColor: '#42b',
     justifyContent: 'center',
   },
   title: {
@@ -182,11 +187,13 @@ const styles = StyleSheet.create({
   },
   bodyText: {
     fontFamily: 'Avenir',
-    fontSize: 18,
+    fontSize: 16,
   },
 
   controls: {
     flex: 1,
+  },
+  button: {
   },
 
   wordList: {
@@ -194,7 +201,7 @@ const styles = StyleSheet.create({
   },
   word: {
     fontFamily: 'Avenir',
-    fontSize: 24,
+    fontSize: 20,
     padding: 5,
   },
 });

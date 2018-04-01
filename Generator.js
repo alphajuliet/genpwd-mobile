@@ -278,12 +278,11 @@ export var generator4 = (() => {
     const row = tr_matrix[row_index];
 
     // Round the probabilities to splits across 100
-    const roundf = R.flip(R.curry(Math.round));
-    const int_row = R.map(R.compose(roundf(1), R.multiply(200)), row);
+    const intRow = R.map(R.compose(Math.floor, R.multiply(200)), row);
 
     // Generate a bag of letters and pick one
-    const listf = WeightedList(R.zipObj(symbols, int_row));
-    return listf();
+    const listFn = WeightedList(R.zipObj(symbols, intRow));
+    return listFn();
   };
 
   // Pre-calculate all the weighted lists
@@ -313,7 +312,7 @@ export var generator4 = (() => {
           letter = nextLetter(tr, allLetters, letter);
           w = w + letter;
         } while (letter != ' ' && w.length < maxLength);
-        w = $.trim(w);
+        w = R.trim(w);
       } while (w.length < minLength);
       return w;
     }
@@ -329,5 +328,12 @@ export var generator4 = (() => {
   return {randomWord: randomWord};
 
 })();
+
+export var generators = [
+  { name: "Generator 1", "fn": generator1 },
+  { name: "Generator 2", "fn": generator2 },
+  { name: "Generator 3", "fn": generator3 },
+  { name: "Markov",      "fn": generator4, "default": true },
+]
 
 // The End
