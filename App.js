@@ -4,8 +4,8 @@
 
 import React from 'react';
 import { generator1, generator2, generator3, generator4, generators } from './Generator';
-import { Alert, StyleSheet, Text, View, FlatList, Button, Picker, StatusBar } from 'react-native';
-import { Container } from 'native-base';
+import { Alert, Clipboard, StyleSheet, Text, View, FlatList, Picker, StatusBar } from 'react-native';
+import { Header, Button, List, ListItem } from 'react-native-elements';
 import * as R from 'ramda';
 
 // --------------------------------
@@ -14,31 +14,18 @@ export default class App extends React.Component {
     return (
       <View style={styles.container}>
         <StatusBar barStyle="light-content"/>
-        <Header/>
+        <Header
+          backgroundColor = '#42b'
+          centerComponent = {{
+            text: 'GenPwd',
+            style: styles.title,
+          }}
+          rightComponent = {{
+            icon: 'menu', 
+            color: '#fff',
+          }}
+        />
         <Passwords/>
-      </View>
-    );
-  }
-}
-
-// --------------------------------
-// App Header
-class Header extends React.Component {
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      title: 'GenPwd',
-      subtitle: 'v3.0.0'
-    };
-  }
-
-  render() {
-    return (
-      <View style={styles.header}>
-        <Text style={styles.title}>{this.state.title}
-          <Text style={styles.subtitle}>{this.state.subtitle}</Text>
-        </Text>
       </View>
     );
   }
@@ -57,6 +44,7 @@ class Passwords extends React.Component {
         numbers: true,
       },
       words: [],
+      nwords: 10,
     };
     this.initGenerators();
     this.onGoButton = this.onGoButton.bind(this);
@@ -66,26 +54,30 @@ class Passwords extends React.Component {
     this.state.generator = generator4; 
   }
 
-  onGoButton() {
-    const gen = this.state.generator;
+  genWords() {
+    const nwords = this.state.nwords;
+    const generator = this.state.generator;
     const opts = this.state.opts;
-    const n = 10;
 
-    // Create an empty array of the right length, then map the random words into
-    // it.
-    var w = (new Array(n)).fill('').map(x => gen.randomWord(opts))
+    var w = (new Array(nwords))
+      .fill('')
+      .map(x => generator.randomWord(opts));
     this.setState({words: w});
+  }
+
+  onGoButton() {
+    this.genWords();
   }
 
   render () {
     return (
       <View style={styles.body}>
+        <WordList
+          words = {this.state.words}
+        />
         <Controls 
           generator = {this.state.generator}
           onGo = {this.onGoButton}
-        />
-        <WordList 
-          words = {this.state.words}
         />
       </View>
     );
@@ -94,6 +86,7 @@ class Passwords extends React.Component {
 
 // --------------------------------
 class Controls extends React.Component {
+  // props: onGo, generator
 
   constructor(props) {
     super(props);
@@ -119,7 +112,16 @@ class Controls extends React.Component {
     return (
       <View style = {styles.controls}>
         <Button
-          style = {styles.button}
+          titleStyle = {{
+            fontFamily: 'Avenir',
+            fontSize: 24,
+            fontWeight: 'bold',
+          }}
+          buttonStyle = {{
+            backgroundColor: '#42b',
+            width: 150,
+            borderRadius: 16,
+          }}
           title = "Generate"
           onPress = {this.props.onGo}
         />
@@ -130,20 +132,41 @@ class Controls extends React.Component {
 
 // --------------------------------
 class WordList extends React.Component {
-
+  // props: words
+  
   constructor(props) {
     super(props);
+    // this.copyToClipboard = this.copyToClipboard.bind(this);
+  }
+
+  copyToClipBoard(e) {
+    // Clipboard.setString('hello');
+    Alert.alert("Word selected");
   }
 
   render() {
+    var words = this.props.words;
+
     return (
       <View style = {styles.wordList}>
-        <FlatList 
-          data = {this.props.words}
-          renderItem = {
-            ({item}) => <Text style={styles.word}>{item}</Text>
-          }
-        />
+        <List> 
+          { 
+            words.map( (e, i) => (
+              <ListItem 
+                key = {i}
+                title = {e}
+                hideChevron = {true}
+                onPress = {this.copyToClipboard}
+                titleStyle = {{
+                  fontSize: 18,
+                }}
+                titleContainerStyle = {{
+                  padding: -5
+                }}
+              />
+            ))
+          } 
+        </List>
       </View>
     );
   }
@@ -171,7 +194,8 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontFamily: 'Avenir',
-    fontSize: 24,
+    fontSize: 28,
+    paddingTop: 10,
   },
   subtitle: {
     color: '#aaa',
@@ -183,7 +207,7 @@ const styles = StyleSheet.create({
     flex: 12,
     flexDirection: 'column',
     padding: 20,
-    backgroundColor: '#eef',
+    backgroundColor: '#fff',
   },
   bodyText: {
     fontFamily: 'Avenir',
@@ -192,8 +216,7 @@ const styles = StyleSheet.create({
 
   controls: {
     flex: 1,
-  },
-  button: {
+    alignItems: 'center',
   },
 
   wordList: {
