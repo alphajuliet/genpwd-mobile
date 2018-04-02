@@ -112,18 +112,14 @@ class Controls extends React.Component {
     return (
       <View style = {styles.controls}>
         <Button
-          titleStyle = {{
-            fontFamily: 'Avenir',
-            fontSize: 24,
-            fontWeight: 'bold',
-          }}
-          buttonStyle = {{
-            backgroundColor: '#42b',
-            width: 150,
-            borderRadius: 16,
-          }}
           title = "Generate"
           onPress = {this.props.onGo}
+          titleStyle = {styles.buttonText}
+          buttonStyle = {{
+            backgroundColor: '#42b',
+            width: 120,
+            borderRadius: 16,
+          }}
         />
       </View>
     );
@@ -139,14 +135,16 @@ class WordList extends React.Component {
     // this.copyToClipboard = this.copyToClipboard.bind(this);
   }
 
-  copyToClipBoard(e) {
-    // Clipboard.setString('hello');
-    Alert.alert("Word selected");
+  copyToClipboard(e) {
+    Clipboard.setString(e);
+    Alert.alert(`'${e}' copied to clipboard`);
   }
 
   render() {
     var words = this.props.words;
+    var that = this;
 
+    // onPress = {this.copyToClipboard}
     return (
       <View style = {styles.wordList}>
         <List> 
@@ -155,14 +153,10 @@ class WordList extends React.Component {
               <ListItem 
                 key = {i}
                 title = {e}
+                onPress = {() => this.copyToClipboard(e)}
                 hideChevron = {true}
-                onPress = {this.copyToClipboard}
-                titleStyle = {{
-                  fontSize: 18,
-                }}
-                titleContainerStyle = {{
-                  padding: -5
-                }}
+                titleStyle = {styles.word}
+                titleContainerStyle = {{ padding: -5 }}
               />
             ))
           } 
@@ -192,8 +186,8 @@ const styles = StyleSheet.create({
   },
   title: {
     color: '#fff',
-    fontWeight: 'bold',
     fontFamily: 'Avenir',
+    fontWeight: 'bold',
     fontSize: 28,
     paddingTop: 10,
   },
@@ -218,14 +212,18 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
   },
+  buttonText: {
+    fontFamily: 'Avenir',
+    fontWeight: 'bold',
+    fontSize: 20,
+  },
 
   wordList: {
     flex: 8,
   },
   word: {
     fontFamily: 'Avenir',
-    fontSize: 20,
-    padding: 5,
+    fontSize: 18,
   },
 });
 
